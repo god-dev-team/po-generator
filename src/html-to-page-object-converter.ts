@@ -1,12 +1,11 @@
 const cheerio = require('cheerio')
 
-export function convertHtmlToPageObject(htmlPage: string): string {
-    var $  = cheerio.load('<h2 class="title">Hello world</h2>')
-    $('h2.title').text('Hello there!')
-    $('h2').addClass('welcome')
-    
-    var theHtml : string = $.html();
-    
-    //=> <h2 class="title welcome">Hello there!</h2>   
+export function convertHtmlToPageObject(htmlPage: string, filename: string): string {
+    var $ = cheerio.load(htmlPage);
+
+    $('*').each(function (i, elem) {
+        console.log("Found tag: " + elem.name + " with id: " + elem.attribs['id'] + " and object:",elem);
+    });
+
     return "Converted";
 }
