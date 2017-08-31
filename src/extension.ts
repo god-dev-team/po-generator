@@ -39,11 +39,12 @@ function handleGenerate() {
         myData = data;
     });
 
-    let converter = convertHtmlToPageObject(filename, myData);
+    let filenameOnly = extractFilename(filename);
+    let converter = convertHtmlToPageObject(filenameOnly, myData);
 
     let newFileName = createFile(converter, filename);
 
-    vs.window.showInformationMessage('Done Page Object ' + newFileName + ' erzeugt!');
+    vs.window.showInformationMessage('Done Page Object ' + extractFilename(newFileName) + ' erzeugt!');
 
 
 }
