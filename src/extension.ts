@@ -37,14 +37,13 @@ function handleGenerate() {
     fs.readFile(doc.fileName, 'utf8', (err, data) => {
         if (err) throw err;
         myData = data;
+        let filenameOnly = extractFilename(filename);
+        let converter = convertHtmlToPageObject(filenameOnly, myData);
+
+        let newFileName = createFile(converter, filename);
+
+        vs.window.showInformationMessage('Done Page Object ' + extractFilename(newFileName) + ' erzeugt!');
     });
-
-    let filenameOnly = extractFilename(filename);
-    let converter = convertHtmlToPageObject(filenameOnly, myData);
-
-    let newFileName = createFile(converter, filename);
-
-    vs.window.showInformationMessage('Done Page Object ' + extractFilename(newFileName) + ' erzeugt!');
 
 
 }
