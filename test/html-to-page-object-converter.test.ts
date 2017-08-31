@@ -14,7 +14,7 @@ import * as convert from '../src/html-to-page-object-converter';
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Html-Converter-Test", () => {
-    let exampleHtml = `
+    let fullExampleHtml = `
     <div class="container">
     <div class="row ">
         <label class="col-md-12"><h2 translate>admin-benutzer-liste.component.Benutzerverwaltung</h2></label>
@@ -68,18 +68,43 @@ suite("Html-Converter-Test", () => {
     </div>
 </div>
     `;
-    // Defines a Mocha unit test
-    test("convertHtmlToPageObject should give the correct result", () => {
-        assert.equal(convertHtmlToPageObject(exampleHtml, "my-html-file"), "Converted");
+
+    //
+    // Test für das Konvertieren eines input-Felds
+    //
+    test("convertHtmlToPageObject should parse input-field correctly", () => {
+        let filename = "simple-input-example";
+        let simpleHtml = '<input type="button"></input><input id="this.input.should.be.recognized"></input>'
+        let expectedPageObject = `import { by, element, ElementFinder } from 'protractor';
+export class SimpleInputExamplePageObject{
+public static recognizedInputId : string = "this.input.should.be.recognized";
+getRecognizedInput() : ElementFinder
+{
+return element(by.id(SimpleInputExamplePageObject.recognizedInputId));
+}
+}`;
+        
+        // Aus dem Filename wird der Classname des PageObjects erzeugt...
+        // ... in diesem Fall SimpleInputExamplePageObject
+        assert.equal(convertHtmlToPageObject(simpleHtml, filename), expectedPageObject);
     });
 
+    // Test für das Konvertieren einer komplexen HTML-Page in ein PageObject
+    test("convertHtmlToPageObject should parse complex html page correctly", () => {
+        let filename = "full-html-example";
+        // Aus dem Filename wird der Classname des PageObjects erzeugt...
+        // ... in diesem Fall MyHtmlFilePageObject
+        // assert.equal(convertHtmlToPageObject(fullExampleHtml, filename), "Converted");
+    });
+
+    // Tests für das Konvertieren von Filenames in die PageObject-Classnames
     test("Filename should be converted to PageObjectClass correctly", () => {
+
         let filename = 'my-file-name.component.html';
         assert.equal(getPageObjectClassForHtmlFilename(filename), "MyFileNamePageObject");
-    });
 
-    test("Filename leitstand-liste... should be converted to PageObjectClass correctly", () => {
-        let filename = 'leitstand-liste.component.html';
-        assert.equal(getPageObjectClassForHtmlFilename(filename), "LeitstandListePageObject");
+        let filename2 = 'leitstand-liste.component.html';
+        assert.equal(getPageObjectClassForHtmlFilename(filename2), "LeitstandListePageObject");
+
     });
 });
