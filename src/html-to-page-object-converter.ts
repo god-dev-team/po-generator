@@ -65,7 +65,7 @@ export function convertHtmlToPageObject(htmlPage: string, filename: string): str
 }
 
 function isNoButton(index: number, element: any): boolean {
-    return isNullOrUndefined(element.attribs['type']) && element.attribs['type'] != 'button'
+    return isNullOrUndefined(element.attribs['type']) || element.attribs['type'] !== 'button'
 }
 
 function toFirstUpper(theString: string): string {
