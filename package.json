@@ -17,12 +17,13 @@
     "contributes": {
         "commands": [{
             "command": "extension.generatePageObject",
-            "title": "generate Page Object"
+            "title": "Generate Page Object"
         }],
         "menus": {
             "explorer/context": [{
                 "command": "extension.generatePageObject",
-                "group": "1_modification"
+                "group": "1_modification",
+                "when": "resourceLangId == html"
             }]
         }
     },
