@@ -1,4 +1,4 @@
-import { convertHtmlToPageObject } from '../src/html-to-page-object-converter';
+import { convertHtmlToPageObject, getPageObjectClassForHtmlFilename } from '../src/html-to-page-object-converter';
 //
 // Note: This example test is leveraging the Mocha test framework.
 // Please refer to their documentation on https://mochajs.org/ for help.
@@ -69,7 +69,17 @@ suite("Html-Converter-Test", () => {
 </div>
     `;
     // Defines a Mocha unit test
-    test("should give the correct result", () => {
+    test("convertHtmlToPageObject should give the correct result", () => {
         assert.equal(convertHtmlToPageObject(exampleHtml, "my-html-file"), "Converted");
+    });
+
+    test("Filename should be converted to PageObjectClass correctly", () => {
+        let filename = 'my-file-name.component.html';
+        assert.equal(getPageObjectClassForHtmlFilename(filename), "MyFileNamePageObject");
+    });
+
+    test("Filename leitstand-liste... should be converted to PageObjectClass correctly", () => {
+        let filename = 'leitstand-liste.component.html';
+        assert.equal(getPageObjectClassForHtmlFilename(filename), "LeitstandListePageObject");
     });
 });
