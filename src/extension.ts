@@ -37,16 +37,15 @@ function handleGenerate() {
     fs.readFile(doc.fileName, 'utf8', (err, data) => {
         if (err) throw err;
         myData = data;
-        console.log(data);
     });
-
-    vs.window.showInformationMessage('Generiere Page Object von ' + filename);
-    console.log('von filename ', filename);
 
     let converter = convertHtmlToPageObject(filename, myData);
 
     let newFileName = createFile(converter, filename);
+
     vs.window.showInformationMessage('Done Page Object ' + newFileName + ' erzeugt!');
+
+
 }
 function createFile(output: string, filename: string): string {
     let newFileName = filename.replace('html', '') + 'po.ts';
