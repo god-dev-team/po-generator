@@ -4,7 +4,7 @@ import { convertHtmlToPageObject } from './html-to-page-object-converter';
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as fs from 'file-system';
-
+import * as path from 'path';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -52,6 +52,10 @@ function createFile(output: string, filename: string): string {
 
     fs.writeFile(newFileName, output, function (err) { });
     return newFileName;
+}
+
+export function extractFilename(uri: string): string {
+    return path.basename(uri);
 }
 // this method is called when your extension is deactivated
 export function deactivate() {

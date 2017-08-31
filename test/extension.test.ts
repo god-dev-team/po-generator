@@ -1,3 +1,4 @@
+import { extractFilename } from '../src/extension';
 //
 // Note: This example test is leveraging the Mocha test framework.
 // Please refer to their documentation on https://mochajs.org/ for help.
@@ -19,4 +20,11 @@ suite("Extension Tests", () => {
         assert.equal(-1, [1, 2, 3].indexOf(5));
         assert.equal(-1, [1, 2, 3].indexOf(0));
     });
+
+    test("extract Filename from '/Entwicklung/projekte/smartconnect/Entwicklung/SctBasis/node_modules/leaflet/docs/reference-1.0.0.html'",
+        () => {
+            let uri = '/Entwicklung/projekte/smartconnect/Entwicklung/SctBasis/node_modules/leaflet/docs/reference-1.0.0.html';
+            let expected = 'reference-1.0.0.html';
+            assert.equal(extractFilename(uri), expected);
+        });
 });
