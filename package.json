@@ -11,17 +11,17 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.generatePageObject"
     ],
     "main": "./out/src/extension",
     "contributes": {
         "commands": [{
-            "command": "extension.sayHello",
-            "title": "Hello World"
+            "command": "extension.generatePageObject",
+            "title": "generate Page Object"
         }],
         "menus": {
             "explorer/context": [{
-                "command": "extension.sayHello",
+                "command": "extension.generatePageObject",
                 "group": "1_modification"
             }]
         }
