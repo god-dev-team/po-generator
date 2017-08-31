@@ -18,7 +18,13 @@
         "commands": [{
             "command": "extension.sayHello",
             "title": "Hello World"
-        }]
+        }],
+        "menus": {
+            "explorer/context": [{
+                "command": "extension.sayHello",
+                "group": "1_modification"
+            }]
+        }
     },
     "scripts": {
         "vscode:prepublish": "tsc -p ./",
