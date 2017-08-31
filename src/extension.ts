@@ -1,4 +1,5 @@
 'use strict';
+import { convertHtmlToPageObject } from './html-to-page-object-converter';
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
@@ -28,19 +29,30 @@ export function activate(context: vscode.ExtensionContext) {
 
 function handleGenerate() {
     let vs = vscode;
-    vs.window.showInformationMessage('Generiere Page Objects!');
     let editor = vs.window.activeTextEditor;
     let doc = editor.document;
     let myData: string;
+    let filename: string = doc.fileName;
+
     fs.readFile(doc.fileName, 'utf8', (err, data) => {
-        debugger;
         if (err) throw err;
         myData = data;
         console.log(data);
     });
 
-    console.log('von filename ', doc.fileName);
+    vs.window.showInformationMessage('Generiere Page Object von ' + filename);
+    console.log('von filename ', filename);
 
+    let converter = convertHtmlToPageObject(filename, myData);
+
+    let newFileName = createFile(converter, filename);
+    vs.window.showInformationMessage('Done Page Object ' + newFileName + ' erzeugt!');
+}
+function createFile(output: string, filename: string): string {
+    let newFileName = filename.replace('html', '') + 'po.ts';
+
+    fs.writeFile(newFileName, output, function (err) { });
+    return newFileName;
 }
 // this method is called when your extension is deactivated
 export function deactivate() {
