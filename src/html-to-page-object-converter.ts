@@ -1,5 +1,6 @@
 import { isNullOrUndefined } from 'util';
 import * as cheerio from 'cheerio';
+import * as StringBuilder from 'stringbuilder';
 
 /**
  * Erzeugt aus einem Filename den korrespondierenden PageObject-Classname
