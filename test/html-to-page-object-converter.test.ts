@@ -78,6 +78,7 @@ suite("Html-Converter-Test", () => {
         let expectedPageObject = `import { by, element, ElementFinder } from 'protractor';
 export class SimpleInputExamplePageObject{
 public static recognizedInputId : string = "this.input.should.be.recognized";
+
 getRecognizedInput() : ElementFinder
 {
 return element(by.id(SimpleInputExamplePageObject.recognizedInputId));

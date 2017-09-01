@@ -1,6 +1,5 @@
 import { isNullOrUndefined } from 'util';
 import * as cheerio from 'cheerio';
-import * as StringBuilder from 'stringbuilder';
 
 /**
  * Erzeugt aus einem Filename den korrespondierenden PageObject-Classname
@@ -28,40 +27,59 @@ export function getPageObjectClassForHtmlFilename(filename: string): String {
 export function convertHtmlToPageObject(htmlPage: string, filename: string): string {
     var $ = cheerio.load(htmlPage);
 
-    /* ForEach auf alle Element
-    $('*').each(function (i, elem) {
-        console.log("Found tag: " + elem.name + " with id: " + elem.attribs['id'] + " and object:", elem);
-    });
-    */
-
-    let pageObjectClass = getPageObjectClassForHtmlFilename(filename);
+    let pageObjectClass: String = getPageObjectClassForHtmlFilename(filename);
     let pageObjectSB: Array<string> = new Array;
     pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
     pageObjectSB.push("export class " + pageObjectClass + "{");
 
     // ForEach auf alle inputs, die nicht type=button haben
-    $('input').filter(isNoButton).each(function (i, elem) {
-        let elementId = elem.attribs['id'];
-        console.log("Found tag: " + elem.name + " with id: " + elementId + " and object:", elem);
+    $('input').filter(isNoButton).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Input")));
+    $('input').filter((i, e) => !isNoButton(i, e)).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Button")));
 
-        // Aus id=foo.bar wird barInputId
-        let idParts: string[] = elementId.split('.');
-        let lastIdPart = idParts[idParts.length - 1];
-        let elementIdVariableName = lastIdPart + "InputId";
-        pageObjectSB.push("public static " + elementIdVariableName + " : string = " + '"' + elementId + '";');
-
-        // Getter
-        let elementGetterHeader = "get" + toFirstUpper(lastIdPart) + "Input() : ElementFinder";
-        pageObjectSB.push(elementGetterHeader);
-        pageObjectSB.push("{");
-        let elementGetterBody = "return element(by.id(" + pageObjectClass + "." + elementIdVariableName + "));";
-        pageObjectSB.push(elementGetterBody);
-        pageObjectSB.push("}");
-    });
+    $('input').filter(isNoButton).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Input")));
+    $('input').filter((i, e) => !isNoButton(i, e)).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Button")));
 
     pageObjectSB.push("}");
-
     return pageObjectSB.join('\n');
+}
+
+/**
+ * Gibt zu einem Element die id aus, anhand der das Element.
+ * z.B. aus <input id = foo.bar>  wird
+ * public static barInputId = "foo.bar"; 
+ */
+function getElementIdVariable(element: any, elementType: string): string {
+    let elementId = element.attribs['id'];
+    if (isNullOrUndefined(elementId)) { return ""; }
+    // Aus id=foo.bar wird barInputId
+    let elementIdVariableName = getElementIdVariableName(element, elementType);
+    return "public static " + elementIdVariableName + " : string = " + '"' + elementId + '";';
+}
+
+function getElementIdVariableName(element: any, elementType: string) {
+    return getLastPartOfElementId(element) + elementType + "Id";
+}
+
+function getElementGetter(element: any, pageObjectClass: String, elementType: string): string[] {
+    let elementId = element.attribs['id'];
+    if (isNullOrUndefined(elementId)) { return []; }
+    let elementGetter: Array<string> = new Array;
+    let elementIdVariableName = getElementIdVariableName(element, elementType);
+    // Getter
+    let elementGetterHeader = "get" + toFirstUpper(getLastPartOfElementId(element)) + "Input() : ElementFinder";
+    elementGetter.push(elementGetterHeader);
+    elementGetter.push("{");
+    let elementGetterBody = "return element(by.id(" + pageObjectClass + "." + elementIdVariableName + "));";
+    elementGetter.push(elementGetterBody);
+    elementGetter.push("}");
+    return elementGetter;
+}
+
+function getLastPartOfElementId(element: any) {
+    let elementId = element.attribs['id'];
+    let idParts: string[] = elementId.split('.');
+    let lastIdPart = idParts[idParts.length - 1];
+    return lastIdPart;
 }
 
 function isNoButton(index: number, element: any): boolean {
@@ -73,5 +91,9 @@ function toFirstUpper(theString: string): string {
     if (theString.length > 0) { toFirstUppered += theString.substring(0, 1).toUpperCase(); }
     if (theString.length > 1) { toFirstUppered += theString.substring(1); }
     return toFirstUppered;
+}
+
+function pushAll<T>(targetArray: Array<T>, toPush: Array<T>) {
+    toPush.forEach(t => targetArray.push(t));
 }
 
