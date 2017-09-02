@@ -29,17 +29,15 @@ export function convertHtmlToPageObject(htmlPage: string, filename: string): str
 
     let pageObjectClass: string = getPageObjectClassForHtmlFilename(filename);
     let pageObjectSB: Array<string> = createImportAndClassDeclaration(pageObjectClass);
-    // pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
-    // pageObjectSB.push("export class " + pageObjectClass + "{");
 
+    // Die public static fields mit den IDs
+    $('input').filter(isInputField).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Input")));
+    $('input,button').filter(isButton).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Button")));
 
-
-    // ForEach auf alle inputs, die nicht type=button haben
-    $('input').filter(isNoButton).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Input")));
-    $('input').filter((i, e) => !isNoButton(i, e)).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Button")));
-
-    $('input').filter(isNoButton).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Input")));
-    $('input').filter((i, e) => !isNoButton(i, e)).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Button")));
+    // Element-Getter und click-Methods für die Buttons
+    $('input').filter(isInputField).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Input")));
+    $('input,button').filter(isButton).each((i, elem) => pushAll(pageObjectSB, getElementGetter(elem, pageObjectClass, "Button")));
+    $('input,button').filter(isButton).each((i, elem) => pushAll(pageObjectSB, getButtonClickMethod(elem, pageObjectClass)));
 
     pageObjectSB.push("}");
     return pageObjectSB.join('\n');
@@ -47,7 +45,7 @@ export function convertHtmlToPageObject(htmlPage: string, filename: string): str
 
 export function createImportAndClassDeclaration(classname: string): Array<string> {
     let pageObjectSB: Array<string> = new Array;
-    pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
+    pageObjectSB.push("import { browser, by, element, ElementFinder } from 'protractor';");
     pageObjectSB.push("export class " + classname + " {");
     return pageObjectSB;
 }
@@ -74,13 +72,29 @@ function getElementGetter(element: any, pageObjectClass: String, elementType: st
     let elementGetter: Array<string> = new Array;
     let elementIdVariableName = getElementIdVariableName(element, elementType);
     // Getter
-    let elementGetterHeader = "get" + toFirstUpper(getLastPartOfElementId(element)) + "Input() : ElementFinder";
+    let elementGetterHeader = "get" + toFirstUpper(getLastPartOfElementId(element)) + elementType + "() : ElementFinder";
     elementGetter.push(elementGetterHeader);
     elementGetter.push("{");
     let elementGetterBody = "return element(by.id(" + pageObjectClass + "." + elementIdVariableName + "));";
     elementGetter.push(elementGetterBody);
     elementGetter.push("}");
     return elementGetter;
+}
+
+function getButtonClickMethod(element: any, pageObjectClass: String): string[] {
+    let elementId = element.attribs['id'];
+    if (isNullOrUndefined(elementId)) { return []; }
+    let clickMethod: Array<string> = new Array;
+    let elementIdVariableName = getElementIdVariableName(element, "Button");
+    // Click-Method
+    let elementGetter = "get" + toFirstUpper(getLastPartOfElementId(element)) + "Button()";
+    let clickMethodHeader = "click" + toFirstUpper(getLastPartOfElementId(element)) + "Button<P>(clickTargetPageObject: P): P";
+    clickMethod.push(clickMethodHeader);
+    clickMethod.push("{");
+    clickMethod.push("browser.driver.wait(this." + elementGetter + ".click());");
+    clickMethod.push("return clickTargetPageObject;");
+    clickMethod.push("}");
+    return clickMethod;
 }
 
 function getLastPartOfElementId(element: any) {
@@ -90,8 +104,12 @@ function getLastPartOfElementId(element: any) {
     return lastIdPart;
 }
 
-function isNoButton(index: number, element: any): boolean {
-    return isNullOrUndefined(element.attribs['type']) || element.attribs['type'] !== 'button'
+function isInputField(index: number, element: any): boolean {
+    return element.name === 'input' && (isNullOrUndefined(element.attribs['type']) || element.attribs['type'] !== 'button')
+}
+
+function isButton(index: number, element: any): boolean {
+    return element.name === 'button' || (element.name === 'input' && !isNullOrUndefined(element.attribs['type']) && element.attribs['type'] === 'button')
 }
 
 function toFirstUpper(theString: string): string {
