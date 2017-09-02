@@ -38,6 +38,7 @@ function handleGenerate() {
         if (err) throw err;
         myData = data;
         let filenameOnly = extractFilename(filename);
+        vs.window.showInformationMessage('Filename: ', filenameOnly);
         let converter = convertHtmlToPageObject(filenameOnly, myData);
 
         let newFileName = createFile(converter, filename);

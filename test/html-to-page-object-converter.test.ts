@@ -1,4 +1,8 @@
-import { convertHtmlToPageObject, getPageObjectClassForHtmlFilename } from '../src/html-to-page-object-converter';
+import {
+    convertHtmlToPageObject,
+    createImportAndClassDeclaration,
+    getPageObjectClassForHtmlFilename,
+} from '../src/html-to-page-object-converter';
 //
 // Note: This example test is leveraging the Mocha test framework.
 // Please refer to their documentation on https://mochajs.org/ for help.
@@ -84,7 +88,7 @@ getRecognizedInput() : ElementFinder
 return element(by.id(SimpleInputExamplePageObject.recognizedInputId));
 }
 }`;
-        
+
         // Aus dem Filename wird der Classname des PageObjects erzeugt...
         // ... in diesem Fall SimpleInputExamplePageObject
         assert.equal(convertHtmlToPageObject(simpleHtml, filename), expectedPageObject);
@@ -106,6 +110,20 @@ return element(by.id(SimpleInputExamplePageObject.recognizedInputId));
 
         let filename2 = 'leitstand-liste.component.html';
         assert.equal(getPageObjectClassForHtmlFilename(filename2), "LeitstandListePageObject");
+
+    });
+    test("should create Import and class definition, check import", () => {
+
+        let classname = 'AdminBenutzerAnlegenPageObject';
+        let expected: string = "import { by, element, ElementFinder } from 'protractor';";
+        assert.equal(createImportAndClassDeclaration(classname)[0], expected);
+
+    });
+    test("should create Import and class definition, check clas definition", () => {
+
+        let classname = 'AdminBenutzerAnlegenPageObject';
+        let expected: string = "export class AdminBenutzerAnlegenPageObject {";
+        assert.equal(createImportAndClassDeclaration(classname)[1], expected);
 
     });
 });

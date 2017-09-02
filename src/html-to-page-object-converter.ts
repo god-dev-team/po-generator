@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
  * Erzeugt aus einem Filename den korrespondierenden PageObject-Classname
  * @param filename Ein Dateiname in kebap-case-Schreibweise, z.B. my-file-name.component.html
  */
-export function getPageObjectClassForHtmlFilename(filename: string): String {
+export function getPageObjectClassForHtmlFilename(filename: string): string {
     // Bis zum ersten Punkt
     let firstPart = filename.split('.')[0];
     // Alle - parts bekommen einen Großbuchstaben 
@@ -27,10 +27,13 @@ export function getPageObjectClassForHtmlFilename(filename: string): String {
 export function convertHtmlToPageObject(htmlPage: string, filename: string): string {
     var $ = cheerio.load(htmlPage);
 
-    let pageObjectClass: String = getPageObjectClassForHtmlFilename(filename);
+    let pageObjectClass: string = getPageObjectClassForHtmlFilename(filename);
     let pageObjectSB: Array<string> = new Array;
+    pageObjectSB.concat(createImportAndClassDeclaration(pageObjectClass));
     pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
     pageObjectSB.push("export class " + pageObjectClass + "{");
+
+
 
     // ForEach auf alle inputs, die nicht type=button haben
     $('input').filter(isNoButton).each((i, elem) => pageObjectSB.push(getElementIdVariable(elem, "Input")));
@@ -43,6 +46,12 @@ export function convertHtmlToPageObject(htmlPage: string, filename: string): str
     return pageObjectSB.join('\n');
 }
 
+export function createImportAndClassDeclaration(classname: string): Array<string> {
+    let pageObjectSB: Array<string> = new Array;
+    pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
+    pageObjectSB.push("export class " + classname + " {");
+    return pageObjectSB;
+}
 /**
  * Gibt zu einem Element die id aus, anhand der das Element.
  * z.B. aus <input id = foo.bar>  wird
