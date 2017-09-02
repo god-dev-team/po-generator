@@ -39,7 +39,7 @@ function handleGenerate() {
         myData = data;
         let filenameOnly = extractFilename(filename);
         vs.window.showInformationMessage('Filename: ', filenameOnly);
-        let converter = convertHtmlToPageObject(filenameOnly, myData);
+        let converter = convertHtmlToPageObject(myData, filenameOnly);
 
         let newFileName = createFile(converter, filename);
 

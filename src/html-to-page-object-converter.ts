@@ -28,10 +28,9 @@ export function convertHtmlToPageObject(htmlPage: string, filename: string): str
     var $ = cheerio.load(htmlPage);
 
     let pageObjectClass: string = getPageObjectClassForHtmlFilename(filename);
-    let pageObjectSB: Array<string> = new Array;
-    pageObjectSB.concat(createImportAndClassDeclaration(pageObjectClass));
-    pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
-    pageObjectSB.push("export class " + pageObjectClass + "{");
+    let pageObjectSB: Array<string> = createImportAndClassDeclaration(pageObjectClass);
+    // pageObjectSB.push("import { by, element, ElementFinder } from 'protractor';");
+    // pageObjectSB.push("export class " + pageObjectClass + "{");
 
 
 
