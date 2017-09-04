@@ -38,20 +38,20 @@ function handleGenerate() {
         if (err) throw err;
         myData = data;
         let filenameOnly = extractFilename(filename);
-        vs.window.showInformationMessage('Filename: ', filenameOnly);
         let converter = convertHtmlToPageObject(myData, filenameOnly);
-
         let newFileName = createFile(converter, filename);
-
-        vs.window.showInformationMessage('Done Page Object ' + extractFilename(newFileName) + ' erzeugt!');
     });
 
 
 }
 function createFile(output: string, filename: string): string {
+    let vs = vscode;
     let newFileName = filename.replace('html', '') + 'po.ts';
 
-    fs.writeFile(newFileName, output, function (err) { });
+    fs.writeFile(newFileName, output, function (err) {
+        if (err) throw err;
+        vs.window.showInformationMessage('PageObject created successfully!', extractFilename(newFileName));
+    });
     return newFileName;
 }
 
